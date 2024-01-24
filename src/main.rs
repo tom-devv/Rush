@@ -1,11 +1,30 @@
-use std::net::{IpAddr, UdpSocket};
+mod packet;
+
+use std::net::{IpAddr, SocketAddr, TcpStream};
 use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io;
+use std::io::{BufRead, BufReader, Cursor, Read, Write};
 use std::str::FromStr;
+use byteorder::{BigEndian, WriteBytesExt};
 
 
 struct MinecraftServer {
     ip: IpAddr,
+}
+
+struct TCPConnection {
+    stream: TcpStream,
+    socket: SocketAddr,
+}
+
+struct Packet {
+    handshake: SocketAddr
+}
+
+impl Packet {
+    fn send(&self) {
+
+    }
 }
 
 fn parse_ip(line: String) -> Result<IpAddr, &'static str> {
@@ -37,17 +56,23 @@ fn read_ips(file_path: &str)-> Result<Vec<IpAddr>, Box<dyn std::error::Error>> {
 }
 
 
-fn init_udp(addr: IpAddr) {
-    let mut socket = addr.to_string();
-    socket.push_str(":25565");
-    println!("{}", &socket);
-    UdpSocket::bind(socket).expect("Couldn't bind");
+fn handshake(socket: SocketAddr) -> io::Result<()> {
+    println!("{}", socket);
+    let mut tcp_stream = TcpStream::connect((socket.ip(), socket.port())).expect("Failed to connect to socket");
+
+    let mut handshake_packet = Vec::new();
+
+
+
+    Ok(())
+
 
 }
 
 fn main() {
-    let addr = read_ips("masscan.txt").expect("Failed to read IP's");
-    for ip in addr {
-        init_udp(ip).expect("TODO: panic message");
-    }
+    // let addr = read_ips("masscan.txt").expect("Failed to read IP's");
+    // handshake(SocketAddr::from_str("188.40.22.42:25503").unwrap());
+    // let (ping, response) = get_status("188.40.22.42:25503", None).unwrap();
+    // println!("Ping {}, Response {:?}", ping, response.players.online);
 }
+
